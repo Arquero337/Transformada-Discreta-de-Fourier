@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
+int main (void)
+{
+    int i=0;
+    float fx=0;// DECLARANDO A FUNÇÃO
+    float num=0;
+    FILE *file;// DECLARANDO O ARQUIVO FILE COMO PONRTEIRO file
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\funcao.txt", "r");// LENDO O ARQUIVO DA FUNÇÃO PASSADO PELO PROFESSOR
+
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    float vetor[1000]; // INICIANDO O VETOR QUE IRA RECEBER TODOS O CONTEUDO DENTRO DA FUNÇÃO TXT
+    while(fscanf(file,"%f", &vetor[i])!= EOF){// GRAVANDO TODOS TODO O CONTEUDO DO ARQUIVO FUNÇÃO NO VETOR ATE O ENF OF FILE
+        printf ("%f\n", vetor[i]);// IMPRIMINDO A PRIMEIRA COLUNA
+        i++;
+    }
+    fclose(file);
+
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\dados.txt", "w");// ABRINDO O ARQUIVOS DADOS PARA QUE POSSA ESCREVER NELE
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    for(i=0;i<1000;i++){
+        fx = 4*cos(vetor[i]+M_PI/4) + 0.5*cos(100*vetor[i]+M_PI/3);// ESCREVENDO A FUNÇÃO DA TRANSFORMADA
+        fprintf(file,"%d %f\n", i, fx);// ESCREVENDO NO ARQUIVO DADOS O RESULTADO DA FUNÇÃO CALCULADA DO PONTO 0 ATE 999
+    }
+    fclose(file);
+
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\script.txt", "w");// ABRINDO O ARQUIVO SCRIPT PARA QUE POSSA FAZER A PLOTAGEM COM O GNUPLOT
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    char comando[50] = "plot 'C:\\Users\\João Pedro\\Desktop\\dados.txt'";// Gravar no arquivo fprintf, DECLARANDO A VARIAVEL CHAR COMANDO QUE CONTEM O COMANDO DE PLOTAGEM
+    fprintf (file,"%s", comando);
+    fclose(file);
+
+    float vetorcos[1000];
+    float vetorsen[1000];
+    float ycos[1000];
+    float xsen[1000];
+    for (i=0; i<1000; i++){
+    fx = 4*cos(vetor[i]+M_PI/4) + 0.5*cos(100*vetor[i]+M_PI/3);
+    vetorcos[i] = cos(vetor[i]);
+    vetorsen[i] = sin (vetor[i]);
+    ycos[i] = vetorcos[i] * fx;//eixo y
+    xsen[i] = vetorsen[i] * fx;//eixo x
+    }
+
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\ycos.txt", "w");// preenchendo o primeiro arquivo
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    for (i=0; i<1000; i++){
+        fprintf(file,"%d %f\n", i, ycos[i]);
+    }
+    fclose(file);
+
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\xsen.txt", "w");// preenchendo o primeiro arquivo
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    for (i=0; i<1000; i++){
+        fprintf(file,"%d %f\n", i, xsen[i]);
+    }
+    fclose(file);
+
+    file = fopen ("C:\\Users\\João Pedro\\Desktop\\script.txt", "w");
+    if (file==NULL){
+        printf ("Nao foi possivel abrir o arquino.\n");
+    return 0;
+    }
+    char comando1[100] = "plot 'C:\\Users\\João Pedro\\Desktop\\dados.txt', ";// Gravar no arquivo fprintf
+    char comando2[100] = "'C:\\Users\\João Pedro\\Desktop\\ycos.txt',";
+    char comando3[100] = "'C:\\Users\\João Pedro\\Desktop\\xsen.txt'";
+    strcat (comando1, comando2);
+    strcat (comando1, comando3);
+    fprintf (file,"%s", comando1);
+    fclose(file);
+
+    float soma=0;
+    float mediacos=0;
+    float mediasen=0;
+    for (i=0; i<1000; i++){
+        soma = soma + ycos[i];
+    }
+    mediacos = soma / 1000;
+
+    soma = 0;
+    printf ("----------------------\n");
+    xsen[0] = 0;
+    xsen[1] = 0;
+    xsen[2] = 0;
+    xsen[3] = 0;
+    xsen[4] = 0;
+    for (i=0; i<1000; i++){
+        soma = soma + xsen[i];
+        printf ("%f\n", xsen[i]);
+    }
+    mediasen = soma / 1000;
+    mediasen = mediasen * 2;
+    mediacos = mediacos * 2;
+    //Calcular angulo de fase
+
+    float angulo = 0;
+    angulo = atan(mediasen/mediacos);
+    printf ("Angulo = %f\n", angulo);
+    printf ("Mediacos: %f\n", mediacos);
+    printf ("Mediasen: %f\n", mediasen);
+
+    // Calcular amplitude
+    float amplitude = 0;
+    amplitude = sqrt(pow(mediasen, 2)+pow(mediacos, 2));
+    printf ("Amplitude = %f\n", amplitude);
+
+    system ("C:\\Users\\\"João Pedro\"\\Desktop\\\"Projeto de comp\"\\gnuplot\\bin\\gnuplot.exe -p \
+            \"C:\\Users\\João Pedro\\Desktop\\script.txt\"");
+    return 0;
+    }
+// A FASE APONTA PARA O NEGATIVO
